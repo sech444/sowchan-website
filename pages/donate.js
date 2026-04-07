@@ -4,8 +4,9 @@ import { useState } from 'react';
 const amounts = [1000, 2500, 5000, 10000, 25000, 50000];
 
 const bankDetails = [
-  { bank: 'First Bank of Nigeria', account: '2034567891', name: 'SOWCHAN' },
-  { bank: 'Access Bank', account: '0123456789', name: 'Society for Women & Children Living with HIV/AIDS in Nigeria' },
+  { bank: 'Fidelity Bank  of Nigeria', account: '6060314085', name: 'Society for women and children living with HIV in Nigeria' },
+//   { bank: 'Access Bank', account: '0123456789', name: 'Society for women and children living with HIV in Nigeria' },
+// ];
 ];
 
 const impactItems = [
