@@ -6,9 +6,9 @@ export default async function handler(req, res) {
 
     const credentials = Buffer.from(`${apiKey}:${apiSecret}`).toString('base64');
 
-    // Fetch with tags AND context so captions come through
+    // Fetch all images inside sowchan/ folder and ALL subfolders recursively
     const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?max_results=500&tags=true&context=true`,
+      `https://api.cloudinary.com/v1_1/${cloudName}/resources/image?prefix=sowchan/&type=upload&max_results=500&tags=true&context=true`,
       {
         headers: {
           Authorization: `Basic ${credentials}`,
@@ -19,20 +19,19 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     const photos = (data.resources || []).map((photo) => {
-      // Cloudinary stores context as { custom: { caption: "...", alt: "..." } }
       const context = photo.context?.custom || {};
 
-      // Caption can be in caption, alt, or description field
       const caption =
         context.caption ||
         context.alt ||
         context.description ||
         '';
 
-      // Category from first tag, default to 'activities'
       const category =
         context.category ||
         (photo.tags && photo.tags[0]) ||
+        // Auto-detect category from subfolder name
+        detectCategory(photo.public_id) ||
         'activities';
 
       return {
@@ -40,6 +39,8 @@ export default async function handler(req, res) {
         publicId: photo.public_id,
         category,
         caption,
+        // Extract subfolder name for display
+        folder: extractFolder(photo.public_id),
         createdAt: photo.created_at,
       };
     });
@@ -52,4 +53,24 @@ export default async function handler(req, res) {
     console.error('Gallery API error:', error);
     res.status(500).json({ error: 'Failed to fetch photos', details: error.message });
   }
+}
+
+// Extract subfolder name from public_id e.g. "sowchan/benue-media/photo1" -> "benue-media"
+function extractFolder(publicId) {
+  const parts = publicId.split('/');
+  if (parts.length > 2) return parts[1]; // subfolder
+  return 'main';
+}
+
+// Auto-detect category from subfolder name
+function detectCategory(publicId) {
+  const lower = publicId.toLowerCase();
+  if (lower.includes('outreach')) return 'outreach';
+  if (lower.includes('training')) return 'training';
+  if (lower.includes('kwara')) return 'kwara';
+  if (lower.includes('benue')) return 'benue';
+  if (lower.includes('international')) return 'international';
+  if (lower.includes('lagos')) return 'outreach';
+  if (lower.includes('abuja')) return 'outreach';
+  return null;
 }

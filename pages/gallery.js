@@ -5,8 +5,9 @@ const categories = [
   { id: 'all', label: 'All Photos' },
   { id: 'outreach', label: 'Community Outreach' },
   { id: 'training', label: 'Training & Advocacy' },
-  { id: 'activities', label: 'Activities' },
+  { id: 'benue', label: 'Benue State' },
   { id: 'kwara', label: 'Kwara State' },
+  { id: 'activities', label: 'Activities' },
   { id: 'international', label: 'International Events' },
 ];
 
@@ -25,6 +26,11 @@ export default function Gallery() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  // Only show category tabs that have photos
+  const activeCats = categories.filter(cat =>
+    cat.id === 'all' || photos.some(p => p.category === cat.id)
+  );
 
   const filtered = activeCategory === 'all'
     ? photos
@@ -57,20 +63,11 @@ export default function Gallery() {
         </div>
       </section>
 
-      {/* HOW TO ADD CAPTIONS — instructions banner */}
-      <section style={{ backgroundColor: '#fff8dc', borderBottom: '2px solid #F5C200' }} className="py-3">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-sm text-gray-700 text-center">
-            💡 <strong>To add captions & categories:</strong> Go to Cloudinary → click a photo → <strong>Edit</strong> → add <code>caption</code> in the <strong>Structured Metadata</strong> or <strong>Context</strong> field, and add a <strong>Tag</strong> for the category.
-          </p>
-        </div>
-      </section>
-
-      {/* FILTER TABS */}
+      {/* FILTER TABS — only shows tabs that have photos */}
       <section style={{ backgroundColor: '#1A1A1A' }} className="py-4 sticky top-16 z-40 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
+            {activeCats.map((cat) => (
               <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
                 className="px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all"
                 style={{
@@ -95,7 +92,7 @@ export default function Gallery() {
           {loading && (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <div className="text-5xl mb-4 animate-pulse">📷</div>
+                <div className="text-5xl mb-4">📷</div>
                 <p style={{ color: '#1A1A1A' }} className="font-semibold">Loading photos...</p>
               </div>
             </div>
@@ -112,8 +109,6 @@ export default function Gallery() {
               {filtered.map((photo, i) => (
                 <div key={i} className="break-inside-avoid mb-4 cursor-pointer group"
                   onClick={() => setLightbox(photo)}>
-
-                  {/* Photo */}
                   <div className="relative overflow-hidden">
                     <img
                       src={photo.src}
@@ -122,28 +117,20 @@ export default function Gallery() {
                       style={{ display: 'block' }}
                       onError={(e) => { e.target.parentElement.parentElement.style.display = 'none'; }}
                     />
-                    {/* Gold corner on hover */}
                     <div className="absolute top-0 left-0 w-0 h-0 group-hover:w-8 group-hover:h-8 transition-all duration-300"
                       style={{ backgroundColor: '#F5C200' }} />
-                    {/* Zoom hint */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{ background: 'rgba(0,0,0,0.2)' }}>
                       <span className="text-white text-2xl">🔍</span>
                     </div>
                   </div>
-
                   {/* Caption always visible below photo */}
                   <div className="bg-white px-4 py-3 border-l-4" style={{ borderColor: '#F5C200' }}>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      {photo.caption || (
-                        <span className="text-gray-400 italic">No caption added yet</span>
-                      )}
+                      {photo.caption || <span className="text-gray-400 italic">No caption added yet</span>}
                     </p>
-                    {/* Category badge */}
-                    <span
-                      className="inline-block mt-2 text-xs font-bold uppercase tracking-wider px-2 py-0.5"
-                      style={{ backgroundColor: '#1A1A1A', color: '#F5C200' }}
-                    >
+                    <span className="inline-block mt-2 text-xs font-bold uppercase tracking-wider px-2 py-0.5"
+                      style={{ backgroundColor: '#1A1A1A', color: '#F5C200' }}>
                       {photo.category}
                     </span>
                   </div>
@@ -180,9 +167,7 @@ export default function Gallery() {
       {/* CTA */}
       <section style={{ backgroundColor: '#1A1A1A' }} className="py-14">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 style={{ fontFamily: 'Playfair Display, serif', color: 'white' }} className="text-3xl font-bold mb-4">
-            Want to Share Your Story?
-          </h2>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', color: 'white' }} className="text-3xl font-bold mb-4">Want to Share Your Story?</h2>
           <p className="text-gray-400 mb-6">If you have photos from SOWCHAN events you'd like to share, contact us.</p>
           <a href="/contact" style={{ backgroundColor: '#F5C200', color: '#1A1A1A' }}
             className="inline-block font-bold uppercase tracking-wider px-8 py-4 text-sm hover:opacity-90 transition-opacity">
