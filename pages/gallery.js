@@ -1,18 +1,9 @@
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 
-const categories = [
-  { id: 'all', label: 'All Photos' },
-  { id: 'outreach', label: 'Community Outreach' },
-  { id: 'training', label: 'Training & Advocacy' },
-  { id: 'benue', label: 'Benue State' },
-  { id: 'kwara', label: 'Kwara State' },
-  { id: 'activities', label: 'Activities' },
-  { id: 'international', label: 'International Events' },
-];
-
 export default function Gallery() {
   const [photos, setPhotos] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
   const [lightbox, setLightbox] = useState(null);
@@ -21,20 +12,34 @@ export default function Gallery() {
     fetch('/api/photos')
       .then((res) => res.json())
       .then((data) => {
-        setPhotos(data.photos || []);
+        const allPhotos = data.photos || [];
+        setPhotos(allPhotos);
+
+        // Build top-level folder tabs (e.g. "Benue Media", "Lagos")
+        // from categories like "Benue Media / Stakeholders" → "Benue Media"
+        const topLevelSet = new Set();
+        allPhotos.forEach(p => {
+          if (p.category && p.category !== 'General') {
+            // Get the top-level folder name (before the first " / ")
+            const topLevel = p.category.split(' / ')[0].trim();
+            topLevelSet.add(topLevel);
+          }
+        });
+
+        setCategories(Array.from(topLevelSet).sort());
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
-  // Only show category tabs that have photos
-  const activeCats = categories.filter(cat =>
-    cat.id === 'all' || photos.some(p => p.category === cat.id)
-  );
-
+  // Filter: match if photo category starts with activeCategory
   const filtered = activeCategory === 'all'
     ? photos
-    : photos.filter((p) => p.category === activeCategory);
+    : photos.filter((p) =>
+        p.category === activeCategory ||
+        p.category.startsWith(activeCategory + ' /') ||
+        p.category.startsWith(activeCategory + '/')
+      );
 
   return (
     <>
@@ -63,24 +68,43 @@ export default function Gallery() {
         </div>
       </section>
 
-      {/* FILTER TABS — only shows tabs that have photos */}
+      {/* FILTER TABS — top-level folder names */}
       <section style={{ backgroundColor: '#1A1A1A' }} className="py-4 sticky top-16 z-40 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2">
-            {activeCats.map((cat) => (
-              <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                className="px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all"
-                style={{
-                  backgroundColor: activeCategory === cat.id ? '#F5C200' : 'transparent',
-                  color: activeCategory === cat.id ? '#1A1A1A' : '#888',
-                  border: `1px solid ${activeCategory === cat.id ? '#F5C200' : '#444'}`,
-                }}>
-                {cat.label}
-                <span className="ml-1 opacity-60">
-                  ({cat.id === 'all' ? photos.length : photos.filter(p => p.category === cat.id).length})
-                </span>
-              </button>
-            ))}
+
+            {/* All Photos */}
+            <button
+              onClick={() => setActiveCategory('all')}
+              className="px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all"
+              style={{
+                backgroundColor: activeCategory === 'all' ? '#F5C200' : 'transparent',
+                color: activeCategory === 'all' ? '#1A1A1A' : '#888',
+                border: `1px solid ${activeCategory === 'all' ? '#F5C200' : '#444'}`,
+              }}>
+              All Photos <span className="ml-1 opacity-60">({photos.length})</span>
+            </button>
+
+            {/* Top-level state/folder tabs */}
+            {categories.map((cat) => {
+              const count = photos.filter(p =>
+                p.category === cat ||
+                p.category.startsWith(cat + ' /') ||
+                p.category.startsWith(cat + '/')
+              ).length;
+              return (
+                <button key={cat} onClick={() => setActiveCategory(cat)}
+                  className="px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all"
+                  style={{
+                    backgroundColor: activeCategory === cat ? '#F5C200' : 'transparent',
+                    color: activeCategory === cat ? '#1A1A1A' : '#888',
+                    border: `1px solid ${activeCategory === cat ? '#F5C200' : '#444'}`,
+                  }}>
+                  {cat} <span className="ml-1 opacity-60">({count})</span>
+                </button>
+              );
+            })}
+
           </div>
         </div>
       </section>
@@ -124,7 +148,6 @@ export default function Gallery() {
                       <span className="text-white text-2xl">🔍</span>
                     </div>
                   </div>
-                  {/* Caption always visible below photo */}
                   <div className="bg-white px-4 py-3 border-l-4" style={{ borderColor: '#F5C200' }}>
                     <p className="text-gray-700 text-sm leading-relaxed">
                       {photo.caption || <span className="text-gray-400 italic">No caption added yet</span>}
