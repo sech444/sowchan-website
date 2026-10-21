@@ -186,27 +186,42 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VISION QUOTE */}
-      <section
-        style={{ backgroundColor: '#C0000C' }}
-        className="py-16"
-      >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div
-            style={{ color: '#F5C200', fontFamily: 'Playfair Display, serif' }}
-            className="text-6xl font-black leading-none mb-6 opacity-30"
-          >
-            "
+      {/* VISION & MISSION */}
+      <section className="grid grid-cols-1 md:grid-cols-2">
+        <div style={{ backgroundColor: '#C0000C' }} className="px-6 sm:px-10 lg:px-16 py-16">
+          <div className="max-w-xl mx-auto md:ml-auto md:mr-0">
+            <div className="flex items-center gap-2 mb-4">
+              <div style={{ width: '30px', height: '2px', backgroundColor: '#F5C200' }}></div>
+              <span style={{ color: '#F5C200' }} className="text-sm font-semibold uppercase tracking-widest">
+                Our Vision
+              </span>
+            </div>
+            <p
+              style={{ fontFamily: 'Playfair Display, serif', color: 'white' }}
+              className="text-2xl md:text-3xl font-semibold leading-relaxed"
+            >
+              A society where all women and children enjoy equal rights, improved health and
+              well-being, economic empowerment, dignity, and equal opportunities to participate
+              in leadership and decision-making.
+            </p>
           </div>
-          <blockquote
-            style={{ fontFamily: 'Playfair Display, serif', color: 'white' }}
-            className="text-2xl md:text-3xl font-semibold italic leading-relaxed -mt-8"
-          >
-            SOWCHAN envisions a country where Women, Girls, and Children living with HIV and AIDS 
-            are given equal rights and privileges like every other member of society.
-          </blockquote>
-          <div className="mt-6 text-yellow-200 text-sm font-semibold uppercase tracking-widest">
-            — Our Vision
+        </div>
+
+        <div style={{ backgroundColor: '#1A1A1A' }} className="px-6 sm:px-10 lg:px-16 py-16">
+          <div className="max-w-xl mx-auto md:mx-0">
+            <div className="flex items-center gap-2 mb-4">
+              <div style={{ width: '30px', height: '2px', backgroundColor: '#F5C200' }}></div>
+              <span style={{ color: '#F5C200' }} className="text-sm font-semibold uppercase tracking-widest">
+                Our Mission
+              </span>
+            </div>
+            <p
+              style={{ fontFamily: 'Playfair Display, serif', color: 'white' }}
+              className="text-2xl md:text-3xl font-semibold leading-relaxed"
+            >
+              To promote and employ rights-based approaches and partnerships that contribute to
+              improving the health, productivity and quality of life of women and children in Nigeria.
+            </p>
           </div>
         </div>
       </section>
